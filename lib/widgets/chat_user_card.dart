@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:message_app/main.dart';
+import 'package:message_app/models/chat_user.dart';
 
 class ChatUserCard extends StatefulWidget {
-  const ChatUserCard({super.key});
+  final ChatUser user;
+  const ChatUserCard({super.key, required this.user});
 
   @override
   State<ChatUserCard> createState() => _ChatUserCardState();
@@ -26,10 +28,10 @@ class _ChatUserCardState extends State<ChatUserCard> {
             child: Icon(CupertinoIcons.person),
           ),
           //user name
-          title: Text("Demo User"),
+          title: Text(widget.user.name),
           //last messgae
           subtitle: Text(
-            'Lastuser message',
+            widget.user.about,
             maxLines: 1,
           ),
           //last messgae time
