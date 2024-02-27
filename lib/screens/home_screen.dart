@@ -4,6 +4,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:message_app/api/apis.dart';
 import 'package:message_app/main.dart';
 import 'package:message_app/models/chat_user.dart';
+import 'package:message_app/screens/profile_screen.dart';
 import 'package:message_app/widgets/chat_user_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -25,7 +26,16 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Message'),
         actions: [
           IconButton(onPressed: () {}, icon: Icon(Icons.search)),
-          IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
+          IconButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => ProfileScreen(
+                              user: list[0],
+                            )));
+              },
+              icon: Icon(Icons.person)),
         ],
       ),
       //floating button to add new user
@@ -36,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
             await APIs.auth.signOut();
             await GoogleSignIn().signOut();
           },
-          child: Icon(Icons.add_comment_rounded),
+          child: Icon(Icons.logout),
         ),
       ),
 
