@@ -2,8 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:message_app/api/apis.dart';
+import 'package:message_app/helper/dialogs.dart';
 import 'package:message_app/main.dart';
 import 'package:message_app/models/chat_user.dart';
+import 'package:message_app/screens/auth/login_screen.dart';
 import 'package:message_app/screens/profile_screen.dart';
 import 'package:message_app/widgets/chat_user_card.dart';
 
@@ -43,8 +45,20 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.only(bottom: 10),
         child: FloatingActionButton(
           onPressed: () async {
-            await APIs.auth.signOut();
-            await GoogleSignIn().signOut();
+            Dialogs.showProgressbar(context);
+            await APIs.auth.signOut().then(
+                  (value) async => {
+                    await GoogleSignIn().signOut().then(
+                          (value) => {
+                            Navigator.pop(context),
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (_) => LoginScreen()),
+                            )
+                          },
+                        ),
+                  },
+                );
           },
           child: Icon(Icons.logout),
         ),
