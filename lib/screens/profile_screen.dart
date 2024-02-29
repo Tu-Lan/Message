@@ -74,7 +74,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   Positioned(
                     bottom: 0,
-                    right: 0,
+                    right: 0.5,
                     child: MaterialButton(
                       elevation: 1,
                       onPressed: () {},
