@@ -87,4 +87,9 @@ class APIs {
         .doc(user.uid)
         .update({'image': me.image});
   }
+
+  //for getting all message of a specific conversation from firestore database
+  static Stream<QuerySnapshot<Map<String, dynamic>>> getAllMessage() {
+    return firestore.collection('messages').snapshots();
+  }
 }
