@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:message_app/main.dart';
 import 'package:message_app/models/chat_user.dart';
+import 'package:message_app/screens/chat_screen.dart';
 
 class ChatUserCard extends StatefulWidget {
   final ChatUser user;
@@ -22,7 +23,15 @@ class _ChatUserCardState extends State<ChatUserCard> {
       elevation: 0.5,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          //for navigating to chat screen
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => ChatScreen(
+                        user: widget.user,
+                      )));
+        },
         child: ListTile(
           //avatar user
           // leading: CircleAvatar(
