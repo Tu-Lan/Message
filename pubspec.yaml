@@ -26,6 +26,10 @@ dependencies:
   cloud_firestore: ^4.15.5
   #showing network images
   cached_network_image: ^3.3.1
+  #for picking image
+  image_picker: ^1.0.7
+  #for accessing firebase storage ( for update files)
+  firebase_storage: ^11.6.7
 
 dev_dependencies:
   flutter_test:

@@ -1,8 +1,12 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:message_app/api/apis.dart';
 import 'package:message_app/helper/dialogs.dart';
 import 'package:message_app/main.dart';
@@ -20,6 +24,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final _formKey = GlobalKey<FormState>();
+  String? _image;
 
   @override
   Widget build(BuildContext context) {
@@ -67,19 +72,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     //user profile picture
                     Stack(
                       children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(mq.height * .1),
-                          child: CachedNetworkImage(
-                            width: mq.height * .15,
-                            height: mq.height * .15,
-                            fit: BoxFit.fill,
-                            imageUrl: widget.user.image,
-                            // placeholder: (context, url) => CircularProgressIndicator(),
-                            errorWidget: (context, url, error) => CircleAvatar(
-                              child: Icon(CupertinoIcons.person),
-                            ),
-                          ),
-                        ),
+                        _image != null
+                            ? ClipRRect(
+                                borderRadius:
+                                    BorderRadius.circular(mq.height * .1),
+                                child: Image.file(
+                                  File(_image!),
+                                  width: mq.height * .15,
+                                  height: mq.height * .15,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : ClipRRect(
+                                borderRadius:
+                                    BorderRadius.circular(mq.height * .1),
+                                child: CachedNetworkImage(
+                                  width: mq.height * .15,
+                                  height: mq.height * .15,
+                                  fit: BoxFit.cover,
+                                  imageUrl: widget.user.image,
+                                  // placeholder: (context, url) => CircularProgressIndicator(),
+                                  errorWidget: (context, url, error) =>
+                                      CircleAvatar(
+                                    child: Icon(CupertinoIcons.person),
+                                  ),
+                                ),
+                              ),
                         //edit image button
                         Positioned(
                           bottom: 0,
@@ -205,7 +223,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         backgroundColor: Colors.white,
                         shape: CircleBorder(),
                         fixedSize: Size(mq.width * .3, mq.height * .15)),
-                    onPressed: () {},
+                    onPressed: () async {
+                      final ImagePicker picker = ImagePicker();
+                      final XFile? image = await picker.pickImage(
+                          source: ImageSource.gallery, imageQuality: 80);
+                      if (image != null) {
+                        log('Image Path: ${image.path}  -- MineType: ${image.mimeType}');
+                        setState(() {
+                          _image = image.path;
+                        });
+                        APIs.updateProfilePicture(File(_image!));
+                        //for hidding bottom sheet
+                        Navigator.pop(context);
+                      }
+                    },
                     child: Image.asset('images/add_image.png'),
                   ),
                   ElevatedButton(
@@ -213,7 +244,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         backgroundColor: Colors.white,
                         shape: CircleBorder(),
                         fixedSize: Size(mq.width * .3, mq.height * .15)),
-                    onPressed: () {},
+                    onPressed: () async {
+                      final ImagePicker picker = ImagePicker();
+                      final XFile? image = await picker.pickImage(
+                          source: ImageSource.camera, imageQuality: 80);
+                      if (image != null) {
+                        log('Image Path: ${image.path}');
+                        setState(() {
+                          _image = image.path;
+                        });
+
+                        APIs.updateProfilePicture(File(_image!));
+                        //for hidding bottom sheet
+                        Navigator.pop(context);
+                      }
+                    },
                     child: Image.asset('images/camera.png'),
                   )
                 ],
