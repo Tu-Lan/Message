@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:message_app/api/apis.dart';
 import 'package:message_app/main.dart';
 import 'package:message_app/models/chat_user.dart';
+import 'package:message_app/models/message.dart';
+import 'package:message_app/widgets/message_card.dart';
 
 class ChatScreen extends StatefulWidget {
   final ChatUser user;
@@ -17,6 +19,11 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  //storing all messages
+  List<Message> _list = [];
+
+  //for handing message text change
+  final _textController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -25,37 +32,34 @@ class _ChatScreenState extends State<ChatScreen> {
           automaticallyImplyLeading: false,
           flexibleSpace: _appBar(),
         ),
+        backgroundColor: Color.fromARGB(255, 234, 248, 255),
         body: Column(
           children: [
             Expanded(
               child: StreamBuilder(
-                stream: APIs.getAllMessage(),
+                stream: APIs.getAllMessage(widget.user),
                 builder: (context, snapshot) {
                   switch (snapshot.connectionState) {
                     //if data is loading
                     case ConnectionState.waiting:
                     case ConnectionState.none:
-                    // return const Center(
-                    //   child: CircularProgressIndicator()
-                    // );
                     //if some or all data is loaded then show it
                     case ConnectionState.active:
                     case ConnectionState.done:
                       final data = snapshot.data?.docs;
                       log('Data: ${jsonEncode(data![0].data())}');
-                      // _list = data
-                      //         ?.map((e) => ChatUser.fromJson(e.data()))
-                      //         .toList() ??
-                      //     [];
-                      final _list = ['hi', 'yeu cac em'];
+                      _list = data
+                              ?.map((e) => Message.fromJson(e.data()))
+                              .toList() ??
+                          [];
+
                       if (_list.isNotEmpty) {
                         return ListView.builder(
                             itemCount: _list.length,
                             padding: EdgeInsets.only(top: mq.height * .01),
                             physics: BouncingScrollPhysics(),
                             itemBuilder: (context, index) {
-                              return Text('Message: ${_list[index]}');
-                              // return Text('Name: ${list[index]}');
+                              return MessageCard(message: _list[index]);
                             });
                       } else {
                         return Center(
@@ -143,8 +147,9 @@ class _ChatScreenState extends State<ChatScreen> {
                         color: Colors.blueAccent,
                         size: 27,
                       )),
-                  const Expanded(
+                  Expanded(
                       child: TextField(
+                    controller: _textController,
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
                     decoration: InputDecoration(
@@ -176,7 +181,12 @@ class _ChatScreenState extends State<ChatScreen> {
 
           //button send message
           MaterialButton(
-            onPressed: () {},
+            onPressed: () {
+              if (_textController.text.isNotEmpty) {
+                APIs.sendMessage(widget.user, _textController.text);
+                _textController.text = '';
+              }
+            },
             minWidth: 0,
             shape: CircleBorder(),
             padding: EdgeInsets.only(top: 10, bottom: 10, right: 5, left: 10),
