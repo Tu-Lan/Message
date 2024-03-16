@@ -1,11 +1,13 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:io';
+import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:message_app/api/apis.dart';
 import 'package:message_app/main.dart';
 import 'package:message_app/models/chat_user.dart';
@@ -133,9 +135,8 @@ class _ChatScreenState extends State<ChatScreen> {
               height: mq.height * .05,
               imageUrl: widget.user.image,
               // placeholder: (context, url) => CircularProgressIndicator(),
-              errorWidget: (context, url, error) => CircleAvatar(
-                child: Icon(CupertinoIcons.person),
-              ),
+              errorWidget: (context, url, error) =>
+                  CircleAvatar(child: Icon(CupertinoIcons.person)),
             ),
           ),
           SizedBox(width: 10),
@@ -207,13 +208,22 @@ class _ChatScreenState extends State<ChatScreen> {
                       )),
                   //take image from camera button
                   IconButton(
-                      onPressed: () => {},
-                      icon: const Icon(
-                        Icons.camera_alt_rounded,
-                        color: Colors.blueAccent,
-                        size: 28,
-                      )),
-                  SizedBox(width: mq.width * .02)
+                      onPressed: () async {
+                        final ImagePicker picker = ImagePicker();
+                        //pick an image
+                        final XFile? image = await picker.pickImage(
+                            source: ImageSource.camera, imageQuality: 80);
+                        if (image != null) {
+                          log('Image Path: ${image.path}');
+
+                          await APIs.sendChatImage(
+                              widget.user, File(image.path));
+                          //for hidding bottom sheet
+                          Navigator.pop(context);
+                        }
+                      },
+                      icon: const Icon(Icons.camera_alt_rounded,
+                          color: Colors.blueAccent, size: 28)),
                 ],
               ),
             ),
@@ -223,7 +233,7 @@ class _ChatScreenState extends State<ChatScreen> {
           MaterialButton(
             onPressed: () {
               if (_textController.text.isNotEmpty) {
-                APIs.sendMessage(widget.user, _textController.text);
+                APIs.sendMessage(widget.user, _textController.text, Type.text);
                 _textController.text = '';
               }
             },

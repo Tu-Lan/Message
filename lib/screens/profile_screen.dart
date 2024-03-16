@@ -246,6 +246,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         fixedSize: Size(mq.width * .3, mq.height * .15)),
                     onPressed: () async {
                       final ImagePicker picker = ImagePicker();
+                      //pick an image
                       final XFile? image = await picker.pickImage(
                           source: ImageSource.camera, imageQuality: 80);
                       if (image != null) {
