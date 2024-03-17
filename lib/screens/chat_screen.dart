@@ -7,6 +7,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:message_app/api/apis.dart';
 import 'package:message_app/main.dart';
@@ -29,8 +30,9 @@ class _ChatScreenState extends State<ChatScreen> {
   //for handing message text change
   final _textController = TextEditingController();
 
-  //for storing value of showing or hiding emoji
-  bool _showEmoji = false;
+  //showEmoji -- for storing value of showing or hiding emoji
+  //isUploading -- for checking if image is uploading or not?
+  bool _showEmoji = false, _isUploading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +78,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
                           if (_list.isNotEmpty) {
                             return ListView.builder(
+                                reverse: true,
                                 itemCount: _list.length,
                                 padding: EdgeInsets.only(top: mq.height * .01),
                                 physics: BouncingScrollPhysics(),
@@ -94,6 +97,18 @@ class _ChatScreenState extends State<ChatScreen> {
                     },
                   ),
                 ),
+
+                //progress indicator for showing uploading
+                if (_isUploading)
+                  const Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 5,
+                        )),
+                  ),
                 //chat input field
                 _chatInput(),
                 if (_showEmoji)
@@ -200,7 +215,19 @@ class _ChatScreenState extends State<ChatScreen> {
                   )),
                   //pick image from galerry
                   IconButton(
-                      onPressed: () => {},
+                      onPressed: () async {
+                        final ImagePicker picker = ImagePicker();
+                        //pick mutil image
+                        final List<XFile> images =
+                            await picker.pickMultiImage(imageQuality: 80);
+                        for (var i in images) {
+                          log('Image Path: ${i.path}');
+                          setState(() => _isUploading = true);
+
+                          await APIs.sendChatImage(widget.user, File(i.path));
+                          setState(() => _isUploading = true);
+                        }
+                      },
                       icon: const Icon(
                         Icons.image,
                         color: Colors.blueAccent,
@@ -215,9 +242,12 @@ class _ChatScreenState extends State<ChatScreen> {
                             source: ImageSource.camera, imageQuality: 80);
                         if (image != null) {
                           log('Image Path: ${image.path}');
+                          setState(() => _isUploading = true);
 
                           await APIs.sendChatImage(
                               widget.user, File(image.path));
+                          setState(() => _isUploading = true);
+
                           //for hidding bottom sheet
                           Navigator.pop(context);
                         }

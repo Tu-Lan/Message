@@ -64,9 +64,12 @@ class _ChatUserCardState extends State<ChatUserCard> {
               title: Text(widget.user.name),
               //last messgae
               subtitle: Text(
-                _message != null ? _message!.msg : widget.user.about,
-                maxLines: 1,
-              ),
+                  _message != null
+                      ? _message!.type == Type.image
+                          ? 'image'
+                          : _message!.msg
+                      : widget.user.about,
+                  maxLines: 1),
               //last messgae time
               trailing: _message == null
                   ? null //show nothing when no message is sent

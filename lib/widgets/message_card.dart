@@ -56,9 +56,13 @@ class _MessageCardState extends State<MessageCard> {
                 : ClipRRect(
                     borderRadius: BorderRadius.circular(mq.height * .3),
                     child: CachedNetworkImage(
-                      width: mq.height * .05,
-                      height: mq.height * .05,
                       imageUrl: widget.message.msg,
+                      placeholder: (context, url) => const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: const CircularProgressIndicator(
+                          strokeWidth: 5,
+                        ),
+                      ),
                       errorWidget: (context, url, error) => Icon(
                         Icons.image,
                         size: 70,
@@ -126,12 +130,16 @@ class _MessageCardState extends State<MessageCard> {
                       color: Colors.black87,
                     ),
                   )
+                //show image
                 : ClipRRect(
                     borderRadius: BorderRadius.circular(15),
                     child: CachedNetworkImage(
                       imageUrl: widget.message.msg,
-                      placeholder: (context, url) => CircularProgressIndicator(
-                        strokeWidth: 2,
+                      placeholder: (context, url) => Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                        ),
                       ),
                       errorWidget: (context, url, error) => Icon(
                         Icons.image,
