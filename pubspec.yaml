@@ -32,6 +32,11 @@ dependencies:
   firebase_storage: ^11.6.7
   #for shwoing emojis
   emoji_picker_flutter: ^1.5.1
+  #for accessing  firebase messaging
+  firebase_messaging: ^14.7.20
+  #for calling REST API
+  http: ^1.2.1
+
 
 dev_dependencies:
   flutter_test:

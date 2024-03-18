@@ -7,6 +7,7 @@ import 'package:message_app/main.dart';
 import 'package:message_app/models/chat_user.dart';
 import 'package:message_app/models/message.dart';
 import 'package:message_app/screens/chat_screen.dart';
+import 'package:message_app/widgets/dialogs/profile_dialog.dart';
 
 class ChatUserCard extends StatefulWidget {
   final ChatUser user;
@@ -44,11 +45,11 @@ class _ChatUserCardState extends State<ChatUserCard> {
             return ListTile(
               //user profile picture
               leading: InkWell(
-                // onTap: () {
-                //   showDialog(
-                //       context: context,
-                //       builder: (_) => ProfileDialog(user: widget.user));
-                // },
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (_) => ProfileDialog(user: widget.user));
+                },
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(mq.height * .03),
                   child: CachedNetworkImage(
