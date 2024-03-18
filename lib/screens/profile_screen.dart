@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -34,27 +35,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Scaffold(
           //app bar
           appBar: AppBar(title: const Text('Profile')),
-          //floating button to add new user
+          //floating button to log out
           floatingActionButton: Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: FloatingActionButton.extended(
               backgroundColor: Colors.redAccent,
               onPressed: () async {
+                //for showing progress dialog
                 Dialogs.showProgressbar(context);
-                await APIs.auth.signOut().then(
-                      (value) async => {
-                        await GoogleSignIn().signOut().then(
-                              (value) => {
-                                Navigator.pop(context),
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (_) => LoginScreen()),
-                                )
-                              },
-                            ),
-                      },
-                    );
+
+                await APIs.updateActiveStatus(false);
+
+                //sign out from app
+                await APIs.auth.signOut().then((value) async {
+                  await GoogleSignIn().signOut().then((value) {
+                    //for hiding progress dialog
+                    Navigator.pop(context);
+
+                    //for moving to home screen
+                    Navigator.pop(context);
+
+                    APIs.auth = FirebaseAuth.instance;
+
+                    //replacing home screen with login screen
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (_) => const LoginScreen()));
+                  });
+                });
               },
               icon: const Icon(Icons.logout),
               label: Text('Logout'),

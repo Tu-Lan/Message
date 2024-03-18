@@ -25,18 +25,13 @@ class _ChatUserCardState extends State<ChatUserCard> {
     return Card(
       margin: EdgeInsets.symmetric(horizontal: mq.width * .04, vertical: 4),
       // color: Colors.blue.shade100,
-      //hiệu ứng khi nhấn button
       elevation: 0.5,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: InkWell(
         onTap: () {
           //for navigating to chat screen
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => ChatScreen(
-                        user: widget.user,
-                      )));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (_) => ChatScreen(user: widget.user)));
         },
         child: StreamBuilder(
           stream: APIs.getLastMessage(widget.user),
@@ -47,15 +42,21 @@ class _ChatUserCardState extends State<ChatUserCard> {
             if (list.isNotEmpty) _message = list[0];
 
             return ListTile(
-              leading: ClipRRect(
-                borderRadius: BorderRadius.circular(mq.height * .3),
-                child: CachedNetworkImage(
-                  width: mq.height * .055,
-                  height: mq.height * .055,
-                  imageUrl: widget.user.image,
-                  // placeholder: (context, url) => CircularProgressIndicator(),
-                  errorWidget: (context, url, error) => CircleAvatar(
-                    child: Icon(CupertinoIcons.person),
+              //user profile picture
+              leading: InkWell(
+                // onTap: () {
+                //   showDialog(
+                //       context: context,
+                //       builder: (_) => ProfileDialog(user: widget.user));
+                // },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(mq.height * .03),
+                  child: CachedNetworkImage(
+                    width: mq.height * .055,
+                    height: mq.height * .055,
+                    imageUrl: widget.user.image,
+                    errorWidget: (context, url, error) =>
+                        const CircleAvatar(child: Icon(CupertinoIcons.person)),
                   ),
                 ),
               ),

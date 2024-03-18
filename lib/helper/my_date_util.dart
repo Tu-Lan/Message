@@ -1,28 +1,52 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class MyDateutil {
-  //for getting formatted time from millsecondsSinceEpoch String
+  // for getting formatted time from milliSecondsSinceEpochs String
   static String getFormattedTime(
       {required BuildContext context, required String time}) {
     final date = DateTime.fromMillisecondsSinceEpoch(int.parse(time));
     return TimeOfDay.fromDateTime(date).format(context);
   }
 
-  //get last message time (used chat user card)
-  static String getLastMessageTime(
+  // for getting formatted time for sent & read
+  static String getMessageTime(
       {required BuildContext context, required String time}) {
     final DateTime sent = DateTime.fromMillisecondsSinceEpoch(int.parse(time));
     final DateTime now = DateTime.now();
 
+    final formattedTime = TimeOfDay.fromDateTime(sent).format(context);
     if (now.day == sent.day &&
         now.month == sent.month &&
         now.year == sent.year) {
-      return TimeOfDay.fromDateTime(sent).format(context);
+      return formattedTime;
     }
 
-    return '${now.day} ${_getMonth(sent)}';
+    return now.year == sent.year
+        ? '$formattedTime - ${sent.day} ${_getMonth(sent)}'
+        : '$formattedTime - ${sent.day} ${_getMonth(sent)} ${sent.year}';
+  }
+
+  //get last message time (used in chat user card)
+  static String getLastMessageTime({
+    required BuildContext context,
+    required String time,
+    bool showYear = false,
+  }) {
+    final DateTime sent = DateTime.fromMillisecondsSinceEpoch(int.parse(time));
+    final DateTime now = DateTime.now();
+
+    final formattedTime = TimeOfDay.fromDateTime(sent).format(context);
+    if (now.day == sent.day &&
+        now.month == sent.month &&
+        now.year == sent.year) {
+      return formattedTime;
+    }
+
+    if (showYear) {
+      return '$formattedTime - ${sent.day} ${_getMonth(sent)} ${sent.year}';
+    } else {
+      return '$formattedTime - ${sent.day} ${_getMonth(sent)}';
+    }
   }
 
   //get formatted last active time of user in chat screen
@@ -39,18 +63,20 @@ class MyDateutil {
     String formattedTime = TimeOfDay.fromDateTime(time).format(context);
     if (time.day == now.day &&
         time.month == now.month &&
-        time.year == now.year) {
+        time.year == time.year) {
       return 'Last seen today at $formattedTime';
     }
+
     if ((now.difference(time).inHours / 24).round() == 1) {
       return 'Last seen yesterday at $formattedTime';
     }
 
     String month = _getMonth(time);
+
     return 'Last seen on ${time.day} $month on $formattedTime';
   }
 
-  //get month name for month no. or index
+  // get month name from month no. or index
   static String _getMonth(DateTime date) {
     switch (date.month) {
       case 1:
